@@ -66,7 +66,7 @@ interpolate_genoprobs = function(probs1, markers1, markers2) {
 
   # Perform some minimal error checking. 
   # TBD: More rigorous checks for matching chromosome names in each object.
-  if(dim(probs1)[[3]] != length(markers1)) {
+  if(length(probs1) != length(markers1)) {
     stop('Probs1 and markers1 must be the same length.')
   }
     
