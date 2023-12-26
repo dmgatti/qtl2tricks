@@ -54,6 +54,9 @@ plot_onegeno_probs = function(probs, map, ind = 1, col = qtl2::CCcolors) {
     } # for(i)
     
   } # for(pr)
+
+  legend(x = 15, y = 140, legend = names(qtl2::CCcolors), pch = 15,
+         col = qtl2::CCcolors, bg = 'white')
   
 } # plot_onegeno_probs()
 
