@@ -82,6 +82,13 @@ interpolate_genoprobs = function(probs1, markers1, markers2) {
                                             mkr2 = markers2[[chr]])
     
   } # for(chr)
+
+  # Set the attributes for the probs object.
+  attr(new_probs1, 'crosstype')    = attr(probs1, 'crosstype')
+  attr(new_probs1, 'is_x_chr')     = attr(probs1, 'is_x_chr')
+  attr(new_probs1, 'alleles')      = attr(probs1, 'alleles')
+  attr(new_probs1, 'alleleprobs')  = attr(probs1, 'alleleprobs')
+  class(new_probs1)                = class(probs1)
   
   return(new_probs1)
   
