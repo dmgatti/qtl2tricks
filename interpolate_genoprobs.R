@@ -74,13 +74,13 @@ interpolate_genoprobs = function(probs1, markers1, markers2) {
   # Chr 1 is the longest chromsome and it is less than 200 Mb.
   if(max(unlist(markers1) < 200)) {
 
-    markers1 = sapply(markers1, '*', 1e6)
+    markers1 = lapply(markers1, '*', 1e6)
 
   } # if(max(unlist(markers1) < 200))
 
   if(max(unlist(markers2) < 200)) {
 
-    markers2 = sapply(markers2, '*', 1e6)
+    markers2 = lapply(markers2, '*', 1e6)
 
   } # if(max(unlist(markers2) < 200))  
   
