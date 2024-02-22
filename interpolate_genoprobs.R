@@ -14,8 +14,8 @@ library(qtl2)
 # Arguments:
 # pr1: 3D numeric array of genoprobs with samples in rows, founders in columns, 
 #      & markers in slices.
-# mkr1: Named numeric vector of markers in pr1.
-# mkr2: Names numeric vector of markers to interpolate genoprobs to.
+# mkr1: Named numeric vector of marker position (in bp) in pr1.
+# mkr2: Names numeric vector of marker positions (in bp) to interpolate genoprobs to.
 interpolate_one_chr = function(pr1, mkr1, mkr2) {
   
   # Convert markers to IRanges to used inter-range functions.
@@ -69,7 +69,21 @@ interpolate_genoprobs = function(probs1, markers1, markers2) {
   if(length(probs1) != length(markers1)) {
     stop('Probs1 and markers1 must be the same length.')
   }
-    
+
+  # If the marker maps are in Mb, convert to bp.
+  # Chr 1 is the longest chromsome and it is less than 200 Mb.
+  if(max(unlist(markers1) < 200)) {
+
+    markers1 = sapply(markers1, '*', 1e6)
+
+  } # if(max(unlist(markers1) < 200))
+
+  if(max(unlist(markers2) < 200)) {
+
+    markers2 = sapply(markers2, '*', 1e6)
+
+  } # if(max(unlist(markers2) < 200))  
+  
   all_chr = names(probs1)
 
   new_probs1        = vector('list', length(probs1))
