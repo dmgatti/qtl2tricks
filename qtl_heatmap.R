@@ -20,11 +20,17 @@ require(tidyverse)
 #               rownames and phenotypes in column names.
 # map: qtl2-style marker map. Named list in which each element is a named numeric
 #      vector with marker names in names. Names of list must be chromosomes.
-# threshold: float which is the truncation threshold. All LOD scores above this
-#            value will be truncated to this value so that large LOD scores
-#            don't dominate the color scale.
+# max_threshold: float which is the maximum truncation threshold. All LOD scores 
+#                above this value will be truncated to this value so that large 
+#                LOD scores don't dominate the color scale.
+# min_threshold: float which is the minimum truncation threshold. All LOD scores
+#                above this value will be truncated to this value to reduce clutter.
+# viridis_scale: string containing one of the valid viridis color scales:
+#                "magma", "inferno", "plasma", "viridis", "cividis", "rocket", 
+#                "mako", "turbo"
 # Returns: QTL heatmap as a ggplot tile-plot.
-qtl_heatmap = function(scan1_output, map, threshold = 8) {
+qtl_heatmap = function(scan1_output, map, max_threshold = 8, 
+                       min_threshold = 4, viridis_scale = 'magma') {
 
   # Check for required arguments.
   if(is.null(scan1_output)) {
@@ -90,7 +96,8 @@ qtl_heatmap = function(scan1_output, map, threshold = 8) {
   lod = do.call(rbind, lod)
   
   # Truncate the LOD scores.
-  lod[lod > 8.0] = 8.0
+  lod[lod < min_threshold] = min_threshold
+  lod[lod > max_threshold] = max_threshold
 
   # Cluster the LOD scores.
   lod_cor = cor(lod)
@@ -116,7 +123,7 @@ qtl_heatmap = function(scan1_output, map, threshold = 8) {
   p = lod |>
         ggplot(aes(pos, Phenotype, fill = LOD, width = width)) +
           geom_tile(color = NA) +
-          scale_fill_viridis_c(option = 'magma', direction = -1) +
+          scale_fill_viridis_c(option = viridis_scale, direction = -1) +
           facet_wrap(~chr, nrow = 1, scales = 'free_x') +
           labs(x = 'Position (Mb)', y = '') +
           theme(axis.text.x   = element_text(angle = 90, hjust = 1, vjust = 0.5),
