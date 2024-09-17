@@ -104,10 +104,12 @@ qtl_heatmap = function(scan1_output, map, max_threshold = 8,
   cl      = hclust(as.dist(1.0 - lod_cor), method = 'average')
   lod     = lod[,cl$order]
 
-  # Make the heatmap.
+  # Create a data.frame of new markers to merge with the LOD scores.
   new_markers = data.frame(mkr = unlist(sapply(new_map, names)),
                            chr = rep(names(new_map), sapply(new_map, length)),
                            pos = unlist(new_map))
+  
+  # Merge in marker positions, reshape, and make chr & phenotype sorted factors.
   lod = data.frame(lod) |>
           rownames_to_column(var = 'mkr') |>
           left_join(new_markers) |>
@@ -120,6 +122,7 @@ qtl_heatmap = function(scan1_output, map, max_threshold = 8,
           mutate(chr       = factor(chr, levels = c(1:19, 'X')),
                  Phenotype = factor(Phenotype, levels = cl$labels[cl$order]))
   
+  # Make the heatmap.
   p = lod |>
         ggplot(aes(pos, Phenotype, fill = LOD, width = width)) +
           geom_tile(color = NA) +
