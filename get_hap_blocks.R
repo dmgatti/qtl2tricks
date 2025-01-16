@@ -146,6 +146,7 @@ get_blocks_1sample = function(probs, mkrs, cor_thr = 0.5, alt_prob_thr = 0.9) {
 
   # Trim down the blocks since we started with 1000.
   blocks = subset(blocks, prox_marker != '')
+  rownames(blocks) = NULL
   
   return(blocks)
 
