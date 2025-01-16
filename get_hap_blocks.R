@@ -27,23 +27,46 @@
 # mkrs: numeric vector containing the marker positions for the
 #       markers in probs. Must be named. Markers must already 
 #       be in the same order as probs.
-get_blocks_1sample = function(probs, mkrs) {
-
+# cor_thr: numeric value indicating the correlation with the proximal 
+#          genoprobs at which the end of a hplotype block will be called. 
+#          Default = 0.5. 
+# alt_prob_thr: numeric value indicating the mean block probability below which
+#               alternate genotypes will be listed. Default = 0.9.
+#
+# Returns: data.frame with one row per haplotype block containing:
+#   prox_marker: character string containing the proximal marker.
+#   dist_marker: character string containing the distal marker.
+#   prox_pos: numeric value containing the proximal marker position.
+#   dist_pos: numeric value containing the distal marker position.
+#   gt: character string containing the genotype with the highest probability.
+#   mean_prob: numeric value containing the mean block probability for the 
+#              genotype in "gt".
+#   prox_idx: numeric value containing the proximal marker index.
+#   dist_idx: numeric value containing the distal marker index.
+#   alt_gt: charater string containing other genotype with high probabilities.
+#           Each genotype separated by a ":".
+#   alt_prob: numeric values containing the mean block probability for the
+#             alternate strains listed in "alt_gt". Values separated by ":".
+get_blocks_1sample = function(probs, mkrs, cor_thr = 0.5, alt_prob_thr = 0.9) {
 
   states  = rownames(probs)
   markers = colnames(probs)
 
   blocks = data.frame(prox_marker = rep('', 1000),
                       dist_marker = rep('', 1000),
+                      prox_pos    = rep(0,  1000),
+                      dist_pos    = rep(0,  1000),
                       gt          = rep('', 1000),
-                      mean_prob   = rep(0, 1000),
-                      prox_idx    = rep(0, 1000),
-                      dist_idx    = rep(0, 1000))
+                      mean_prob   = rep(0,  1000),
+                      prox_idx    = rep(0,  1000),
+                      dist_idx    = rep(0,  1000),
+                      alt_gt      = rep(NA, 1000),
+                      alt_prob    = rep(NA, 1000))
   
   block_idx = 1
   prox_idx  = 1
   dist_idx  = 1
-  
+
   # While the proximal index is less than the number of markers.
   while(prox_idx < length(markers)) {
   
@@ -56,7 +79,7 @@ get_blocks_1sample = function(probs, mkrs) {
     
     # Find the distal end of the haplotype block by searching for the
     # first marker that has low correlation with the proximal marker.
-    wh = which(probs_cor < 0.5)
+    wh = which(probs_cor < cor_thr)
     
     # This may happen at the end of the chromosome.
     if(length(wh) == 0) {
@@ -69,7 +92,8 @@ get_blocks_1sample = function(probs, mkrs) {
 
     } # else
 
-    # If we have a one marker block, skip over it.  
+    # If we have a one marker block, skip over it. Otherwise,
+    # process the block. 
     if(prox_idx != dist_idx) {
   
       # Set the proximal and distal marker names.
@@ -80,7 +104,7 @@ get_blocks_1sample = function(probs, mkrs) {
       rm_probs = rowMeans(probs[,prox_idx:dist_idx])
       
       # Set the called genotype to the state with the highest probability.
-      blocks$gt[block_idx]        = names(which.max(rm_probs))
+      blocks$gt[block_idx] = names(which.max(rm_probs))
       
       # Get the mean probability for the maximal state.
       blocks$mean_prob[block_idx] = max(rm_probs)
@@ -88,6 +112,27 @@ get_blocks_1sample = function(probs, mkrs) {
       # Set the proximal and distal maker indices.
       blocks$prox_idx[block_idx] = prox_idx
       blocks$dist_idx[block_idx] = dist_idx
+      
+      # Determine whethere we need to include alternate genotypes by
+      # seeing whether the mean block probability is over alt_prob_thr.
+      rm_probs = sort(rm_probs, decreasing = TRUE)
+      # Get the cumulative sum of the genotype probs.
+      # We use this to determine whether we should report more than one
+      # genotype.
+      cs_probs = cumsum(rm_probs)
+
+      num_gt = min(which(cs_probs >= alt_prob_thr))
+      if(num_gt > 1) {
+      
+        # Add alternate genotypes.
+        alt_rng = 2:num_gt
+        
+        blocks$alt_gt[block_idx] = paste(names(rm_probs)[alt_rng], 
+                                         collapse = ';')
+        blocks$alt_prob[block_idx] = paste(round(rm_probs[alt_rng], digits = 4), 
+                                           collapse = ';')
+      
+      } # if(num_gt > 1)
 
       # Increment block index.
       block_idx = block_idx + 1
@@ -163,7 +208,7 @@ get_hap_blocks = function(probs, map) {
     for(sample in 1:nrow(probs[[chr]])) {
 
       sample_blocks = get_blocks_1sample(probs[[chr]][sample,,], map[[chr]])
-      sample_blocks = cbind(id = rownames(probs[[chr]][sample]), chr = chr, 
+      sample_blocks = cbind(id = rownames(probs[[chr]])[sample], chr = chr, 
                             sample_blocks)
 
       hap_blocks = rbind(hap_blocks, sample_blocks)
