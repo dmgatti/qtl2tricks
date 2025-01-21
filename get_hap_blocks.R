@@ -166,10 +166,15 @@ get_blocks_1sample = function(probs, mkrs, cor_thr = 0.5, alt_prob_thr = 0.9) {
 #      vector containing marker positions in Mb. The vector names must be
 #      marker names. The list element names are chromosomes. Marker names
 #      must match those in "probs".
+# cor_thr: numeric value indicating the correlation with the proximal 
+#          genoprobs at which the end of a hplotype block will be called. 
+#          Default = 0.5. 
+# alt_prob_thr: numeric value indicating the mean block probability below which
+#               alternate genotypes will be listed. Default = 0.9.
 # NOTE: I tried to parallelize this with foreach and doParallel, but the
 # workers couldn't find the get_blocks_1sample() function even though it
 # was in the environment when I called %dopar%.
-get_hap_blocks = function(probs, map) {
+get_hap_blocks = function(probs, map, cor_thr = 0.5, alt_prob_thr = 0.9) {
 
   # Verify that probs and map have the same length.
   if(length(probs) != length(map)) {
@@ -185,7 +190,7 @@ get_hap_blocks = function(probs, map) {
 
   # Verify that we have a 36-state genoprobs object.
   if(ncol(probs[[1]]) != 36) {
-    stop('get_hap_blocks: This functtion only works with the 36-state genoprobs.')
+    stop('get_hap_blocks: This function only works with the 36-state genoprobs.')
   } # if(ncol(probs[[1]]) != 36)
 
   # Verify that the markers are the same between probs and map.
@@ -212,7 +217,7 @@ get_hap_blocks = function(probs, map) {
       sample_blocks = cbind(id = rownames(probs[[chr]])[sample], chr = chr, 
                             sample_blocks)
 
-      hap_blocks = rbind(hap_blocks, sample_blocks)
+      hap_blocks = rbind(hap_blocks, sample_blocks, cor_thr, alt_prob_thr)
 
     } # for(sample)
 

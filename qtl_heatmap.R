@@ -126,7 +126,7 @@ qtl_heatmap = function(scan1_output, map, max_threshold = 8,
   p = lod |>
         ggplot(aes(pos, Phenotype, fill = LOD, width = width)) +
           geom_tile(color = NA) +
-          scale_fill_viridis_c(option = viridis_scale, direction = -1) +
+          scale_fill_viridis_c(option = viridis_scale, direction = 1) +
           facet_wrap(~chr, nrow = 1, scales = 'free_x') +
           labs(x = 'Position (Mb)', y = '') +
           theme(axis.text.x   = element_text(angle = 90, hjust = 1, vjust = 0.5),
