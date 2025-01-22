@@ -204,7 +204,7 @@ get_hap_blocks = function(probs, map, cor_thr = 0.5, alt_prob_thr = 0.9) {
   } # for(chr)
 
   # Estimate haplotype blocks for all samples on all chromosomes.
-  hap_blocks = NULL
+  hap_blocks = setNames(vector('list', length(probs)), names(probs))
 
   for(chr in seq_along(probs)) {
 
@@ -213,11 +213,13 @@ get_hap_blocks = function(probs, map, cor_thr = 0.5, alt_prob_thr = 0.9) {
 
     for(sample in 1:nrow(probs[[chr]])) {
 
-      sample_blocks = get_blocks_1sample(probs[[chr]][sample,,], map[[chr]])
-      sample_blocks = cbind(id = rownames(probs[[chr]])[sample], chr = chr, 
+      sample_blocks = get_blocks_1sample(probs[[chr]][sample,,], map[[chr]], 
+                                         cor_thr, alt_prob_thr)
+      sample_blocks = cbind(id  = rownames(probs[[chr]])[sample], 
+                            chr = chr, 
                             sample_blocks)
 
-      hap_blocks = rbind(hap_blocks, sample_blocks, cor_thr, alt_prob_thr)
+      hap_blocks[[chr]] = rbind(hap_blocks[[chr]], sample_blocks)
 
     } # for(sample)
 
@@ -225,6 +227,10 @@ get_hap_blocks = function(probs, map, cor_thr = 0.5, alt_prob_thr = 0.9) {
 
   } # for(chr)
 
+  # Combine the haplotype blocks from all chromosomes.
+  hap_blocks           = do.call(rbind, hap_blocks)
+  rownames(hap_blocks) = NULL
+  
   return(hap_blocks)
 
 } # get_hap_blocks()
