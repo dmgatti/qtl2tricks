@@ -52,16 +52,17 @@ get_blocks_1sample = function(probs, mkrs, cor_thr = 0.5, alt_prob_thr = 0.9) {
   states  = rownames(probs)
   markers = colnames(probs)
 
-  blocks = data.frame(prox_marker = rep('', 1000),
-                      dist_marker = rep('', 1000),
-                      prox_pos    = rep(0,  1000),
-                      dist_pos    = rep(0,  1000),
-                      gt          = rep('', 1000),
-                      mean_prob   = rep(0,  1000),
-                      prox_idx    = rep(0,  1000),
-                      dist_idx    = rep(0,  1000),
-                      alt_gt      = rep(NA, 1000),
-                      alt_prob    = rep(NA, 1000))
+  n_blocks = 2000
+  blocks = data.frame(prox_marker = rep('', n_blocks),
+                      dist_marker = rep('', n_blocks),
+                      prox_pos    = rep(0,  n_blocks),
+                      dist_pos    = rep(0,  n_blocks),
+                      gt          = rep('', n_blocks),
+                      mean_prob   = rep(0,  n_blocks),
+                      prox_idx    = rep(0,  n_blocks),
+                      dist_idx    = rep(0,  n_blocks),
+                      alt_gt      = rep(NA, n_blocks),
+                      alt_prob    = rep(NA, n_blocks))
   
   block_idx = 1
   prox_idx  = 1
