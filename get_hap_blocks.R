@@ -110,9 +110,13 @@ get_blocks_1sample = function(probs, mkrs, cor_thr = 0.5, alt_prob_thr = 0.9) {
       # Get the mean probability for the maximal state.
       blocks$mean_prob[block_idx] = max(rm_probs)
     
-      # Set the proximal and distal maker indices.
+      # Set the proximal and distal marker indices.
       blocks$prox_idx[block_idx] = prox_idx
       blocks$dist_idx[block_idx] = dist_idx
+
+      # Set the proximan and distal marker positions.
+      blocks$prox_pos[block_idx] = mkrs[prox_idx]
+      blocks$dist_pos[block_idx] = mkrs[dist_idx]
       
       # Determine whethere we need to include alternate genotypes by
       # seeing whether the mean block probability is over alt_prob_thr.
