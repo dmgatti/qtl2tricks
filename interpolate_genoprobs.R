@@ -17,6 +17,10 @@ library(qtl2)
 # mkr1: Named numeric vector of marker position (in bp) in pr1.
 # mkr2: Names numeric vector of marker positions (in bp) to interpolate genoprobs to.
 interpolate_one_chr = function(pr1, mkr1, mkr2) {
+
+  # Verify that the marker names in pr1 and mkr1 are identical and in the same
+  # order.
+  stopifnot(dimnames(pr1)[[3]] == names(mkr1))
   
   # Convert markers to IRanges to used inter-range functions.
   mkr1 = IRanges(start = mkr1, width = 1, names = names(mkr1))
