@@ -21,7 +21,14 @@ interpolate_one_chr = function(pr1, mkr1, mkr2) {
   # Verify that the marker names in pr1 and mkr1 are identical and in the same
   # order.
   stopifnot(dimnames(pr1)[[3]] == names(mkr1))
-  
+
+  # Verify that the markers are in bp and not Mbp.
+  # Chr 1 is 195 Mbp long, so if the minimum value is greater than 200,
+  # I'm assuming the marker units are bp. The start of most chromosomes is
+  # around 3 Mbp.
+  stopifnot(min(mkr1) > 200)
+  stopifnot(min(mkr2) > 200)
+
   # Convert markers to IRanges to used inter-range functions.
   mkr1 = IRanges(start = mkr1, width = 1, names = names(mkr1))
   mkr2 = IRanges(start = mkr2, width = 1, names = names(mkr2))
