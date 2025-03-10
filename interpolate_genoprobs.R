@@ -42,12 +42,12 @@ interpolate_one_chr = function(pr1, mkr1, mkr2) {
   distal[is.na(distal)]     = length(mkr1)
   
   # Ensure indices are within the range
-  proximal[proximal > dim(pr1)[3]] <- dim(pr1)[3]
-  distal[distal > dim(pr1)[3]] <- dim(pr1)[3]
+  proximal[proximal > dim(pr1)[3]] = dim(pr1)[3]
+  distal[distal     > dim(pr1)[3]] = dim(pr1)[3]
   
   # Get the proximal and distal probs.
   prox_pr = pr1[,,proximal, drop = FALSE]
-  dist_pr = pr1[,,distal, drop = FALSE]
+  dist_pr = pr1[,,distal,   drop = FALSE]
   
   # interpolate values
   mkr_interp = (start(mkr2) - start(mkr1)[proximal]) / (start(mkr1)[distal] - start(mkr1)[proximal])
