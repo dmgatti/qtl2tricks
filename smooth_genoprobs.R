@@ -42,7 +42,7 @@ smooth_genoprobs = function(probs, window = 5) {
   
   attributes(new_probs) = attributes(probs)
   
-  return(probs)
+  return(new_probs)
 
 } # smooth_genoprobs()
 
@@ -50,12 +50,11 @@ smooth_genoprobs = function(probs, window = 5) {
 # Smooth one chromosome.
 smooth_one_chr = function(pr, win) {
 
-  new_pr = array(0, dim = c(nrow(pr), ncol(pr), dim(pr)[3]), 
-                 dimnames = list(rownames(pr), colnames(pr), dimnames(pr)[[3]]))
+  new_pr = array(0, dim = dim(pr), dimnames = dimnames(pr))
   
   # Fill in the beginning and the end of the probs.
   half_win  = floor(win / 2)
-  start_rng = 1:half_win
+  start_rng = 1:(half_win - 1)
   # Looping through the first markers.
   for(i in start_rng) {
   
@@ -91,5 +90,5 @@ smooth_one_chr = function(pr, win) {
 base_dir = '/projects/korstanje-lab/Pureplex/TumorStudy_combined/results/quilt/20250421_tumorstudy_combined/2000/geno_probs'
 probs = readRDS(file.path(base_dir, 'complete_alleleprobs.rds'))
 
-np = smooth_genoprobs(probs, window = 50)
+np = smooth_genoprobs(probs, 500)
 
