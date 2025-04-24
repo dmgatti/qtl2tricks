@@ -109,7 +109,7 @@ smooth_one_chr = function(pr, m1, m2, win) {
                  dimnames = list(rownames(pr), colnames(pr), names(m2)))
   for(i in 1:dim(new_pr)[3]) {
   
-    new_pr[,,i] = apply(pr[,,m1_ranges[[i]]], 1:2, mean)
+    new_pr[,,i] = apply(pr[,,m1_ranges[[i]], drop = FALSE], 1:2, mean)
   
   } # for(i)
   
