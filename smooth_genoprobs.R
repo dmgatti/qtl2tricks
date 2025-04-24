@@ -87,8 +87,8 @@ smooth_one_chr = function(pr, win) {
 ############
 # Test code.
 
-base_dir = '/projects/korstanje-lab/Pureplex/TumorStudy_combined/results/quilt/20250421_tumorstudy_combined/2000/geno_probs'
-probs = readRDS(file.path(base_dir, 'complete_alleleprobs.rds'))
+#base_dir = '/projects/korstanje-lab/Pureplex/TumorStudy_combined/results/quilt/20250421_tumorstudy_combined/2000/geno_probs'
+#probs = readRDS(file.path(base_dir, 'complete_alleleprobs.rds'))
 
-np = smooth_genoprobs(probs, 500)
+#np = smooth_genoprobs(probs, 500)
 
