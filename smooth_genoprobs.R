@@ -51,32 +51,34 @@ smooth_genoprobs = function(probs, window = 5) {
 smooth_one_chr = function(pr, win) {
 
   new_pr = array(0, dim = dim(pr), dimnames = dimnames(pr))
-  
+
   # Fill in the beginning and the end of the probs.
   half_win  = floor(win / 2)
-  start_rng = 1:(half_win - 1)
+  start_rng = 1:half_win
+
   # Looping through the first markers.
   for(i in start_rng) {
-  
+
     new_pr[,,i] = apply(pr[,,1:i, drop = FALSE], 1:2, mean)
-  
+
   } # for(i)
 
   n_markers = dim(pr)[3]
-  end_rng = (n_markers - half_win + 1):n_markers
+  end_rng = (n_markers - ceiling(half_win)):n_markers
+
   # Looping through the last markers.
   for(i in end_rng) {
-  
+
     new_pr[,,i] = apply(pr[,,i:n_markers, drop = FALSE], 1:2, mean)
-  
-  } # for(i)  
+
+  } # for(i)
 
   # Loop through samples.
-  rng = (half_win):(n_markers - half_win)
+  rng = (half_win + 1):(n_markers - half_win)
   for(i in 1:nrow(pr)) {
-    
+
       new_pr[i,,rng] = t(apply(pr[i,,], 1, movingaves, window = win))
-  
+
   } # for(i)
 
   return(new_pr)
