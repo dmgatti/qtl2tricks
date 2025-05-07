@@ -107,24 +107,24 @@ clean_genoprobs_by_col = function(probs, thr = 1.0) {
 
 
 # Test code:
-probs_file = '/projects/korstanje-lab/Pureplex/AnalyzedData/TumorStudy_combined/results/quilt/20250421_tumorstudy_combined/2000/geno_probs/complete_genoprobs.rds'
-probs = readRDS(probs_file)
+#probs_file = '/projects/korstanje-lab/Pureplex/AnalyzedData/TumorStudy_combined/results/quilt/20250421_tumorstudy_combined/2000/geno_probs/complete_genoprobs.rds'
+#probs = readRDS(probs_file)
 
-new_probs = clean_genoprobs_by_col(probs, 20)
+#new_probs = clean_genoprobs_by_col(probs, 20)
 
 # Check Chr each chromosome. This should be 1, 1.
-for(i in seq_along(probs)) {
+#for(i in seq_along(probs)) {
 
-  print(paste('CHR:', i, ' : ', range(apply(probs[[i]], 3, rowSums))))
+#  print(paste('CHR:', i, ' : ', range(apply(probs[[i]], 3, rowSums))))
 
-} # for(i)
+#} # for(i)
 
-for(i in seq_along(probs)) {
+#for(i in seq_along(probs)) {
 
-   cs = apply(probs[[i]][,c('AC', 'AD', 'BC', 'BD'),], 2:3, sum)
+#   cs = apply(probs[[i]][,c('AC', 'AD', 'BC', 'BD'),], 2:3, sum)
 
-   print(range(apply(cs, 2, min)))
+#   print(range(apply(cs, 2, min)))
 
-} # for(i)
+#} # for(i)
 
 
