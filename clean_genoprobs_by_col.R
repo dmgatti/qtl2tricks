@@ -1,5 +1,10 @@
 ################################################################################
-# Given a qtl2-style genoprobs object, 
+# Given a qtl2-style genoprobs object, set the values in a column equal to zero
+# if the sum of that column is less than some threshold.
+# 
+# Daniel Gatti
+# dan.gatti@jax.org
+# 2025-05-07
 ################################################################################
 
 clean_one_chr = function(pr, thr) {
