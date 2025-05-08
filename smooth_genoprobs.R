@@ -74,7 +74,7 @@ smooth_one_chr = function(pr, win) {
   } # for(i)
 
   # Loop through samples.
-  rng = (half_win + 1):(n_markers - half_win)
+  rng = (half_win + as.numeric(win %% 2 != 0)):(n_markers - half_win)
   for(i in 1:nrow(pr)) {
 
       new_pr[i,,rng] = t(apply(pr[i,,], 1, movingaves, window = win))
@@ -89,8 +89,8 @@ smooth_one_chr = function(pr, win) {
 ############
 # Test code.
 
-#base_dir = '/projects/korstanje-lab/Pureplex/TumorStudy_combined/results/quilt/20250421_tumorstudy_combined/2000/geno_probs'
+#base_dir = '/projects/korstanje-lab/Pureplex/AnalyzedData/TumorStudy_combined/results/quilt/20250421_tumorstudy_combined/2000/geno_probs'
 #probs = readRDS(file.path(base_dir, 'complete_alleleprobs.rds'))
 
-#np = smooth_genoprobs(probs, 500)
+#np = smooth_genoprobs(probs, 300)
 
