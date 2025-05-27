@@ -150,35 +150,35 @@ compare_coat = function(pheno, probs, map) {
 
 
 # Prepare test data.
-library(qtl2convert)
+#library(qtl2convert)
 
-pheno = read.csv('C:/Users/c-dgatti/Documents/data/coat_color_demo.csv',
-                 colClasses = rep('character', 2))
-probs = readRDS('C:/Users/c-dgatti/Documents/TB/haplo_reconstr/tufts_do_alleleprobs_202409.rds')
-markers = read.csv('C:/Users/c-dgatti/Documents/muga/gm_uwisc_v4.csv')
-markers = markers[markers$chr %in% c(1:19, 'X'),]
-markers$pos = markers$bp_grcm39 * 1e-6
-map     = map_df_to_list(markers, pos_column = 'pos')
+#pheno = read.csv('C:/Users/c-dgatti/Documents/data/coat_color_demo.csv',
+#                 colClasses = rep('character', 2))
+#probs = readRDS('C:/Users/c-dgatti/Documents/TB/haplo_reconstr/tufts_do_alleleprobs_202409.rds')
+#markers = read.csv('C:/Users/c-dgatti/Documents/muga/gm_uwisc_v4.csv')
+#markers = markers[markers$chr %in% c(1:19, 'X'),]
+#markers$pos = markers$bp_grcm39 * 1e-6
+#map     = map_df_to_list(markers, pos_column = 'pos')
 
 # Fix samples and markers.
-rn = sapply(strsplit(rownames(probs[[1]]), ';'), '[', 2)
+#rn = sapply(strsplit(rownames(probs[[1]]), ';'), '[', 2)
 
-common_samples = rn[rn %in% pheno$id]
-pheno = pheno[pheno$id %in% common_samples,]
-pheno = pheno[match(common_samples, pheno$id),]
+#common_samples = rn[rn %in% pheno$id]
+#pheno = pheno[pheno$id %in% common_samples,]
+#pheno = pheno[match(common_samples, pheno$id),]
 
-for(i in seq_along(probs)) {
+#for(i in seq_along(probs)) {
 
-  common_markers = intersect(names(map[[i]]), dimnames(probs[[i]])[[3]])
+#  common_markers = intersect(names(map[[i]]), dimnames(probs[[i]])[[3]])
 
-  rownames(probs[[i]]) = rn
-  probs[[i]] = probs[[i]][common_samples,,common_markers]
-  map[[i]]   = map[[i]][common_markers]
-  stopifnot(names(map[[i]]) == dimnames(probs[[i]])[[3]])
+#  rownames(probs[[i]]) = rn
+#  probs[[i]] = probs[[i]][common_samples,,common_markers]
+#  map[[i]]   = map[[i]][common_markers]
+#  stopifnot(names(map[[i]]) == dimnames(probs[[i]])[[3]])
 
-} # for(i)
+#} # for(i)
 
-stopifnot(pheno$id == rownames(probs[[1]]))
+#stopifnot(pheno$id == rownames(probs[[1]]))
 
-coat_comp = compare_coat(pheno, probs, map)
+#coat_comp = compare_coat(pheno, probs, map)
 
