@@ -25,7 +25,7 @@ plot_onegeno_probs = function(probs, map, ind = 1, col = qtl2::CCcolors) {
   
   plot(1, 1, col = 'white', xlim = c(0,21), ylim = c(200, 0), las = 1,
        xaxt = 'n', ann = F)
-  axis(side = 1, at = 1:20, labels = names(probs))
+  axis(side = 1, at = 1:length(probs), labels = names(probs))
   mtext(text = rownames(probs[[1]])[ind], side = 3, line = 0.5, cex = 2)
   abline(h = c(0, 50, 100, 150, 200), col = 'grey80')
   abline(v = 1:20, col = 'grey80')
@@ -46,7 +46,7 @@ plot_onegeno_probs = function(probs, map, ind = 1, col = qtl2::CCcolors) {
     
     chr_map = c(map[[chr]], rev(map[[chr]]))
 
-    for(i in 1:8) {
+    for(i in 1:ncol(probs[[1]])) {
       
       polygon(x = chr - 0.35 + c(pr[[chr]][,i], rev(pr[[chr]][,i + 1])) * 0.7, 
               y = chr_map, density = NULL, col = col[i], border = NA)
