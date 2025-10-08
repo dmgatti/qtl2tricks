@@ -106,8 +106,9 @@ scan1_surv_intcovar = function(chr, pr, pheno, addcovar, intcovar) {
   
   # Get log-likelihood for each marker.
   for(j in 1:n_markers) {
-    
-    lod[j,1] = coxph(pheno ~ addcovar + pr[,,j] + intcovar:pr[,,j])$loglik[2]
+
+    null_ll  = coxph(pheno ~ addcovar + pr[,,j])$loglik[2]
+    lod[j,1] = coxph(pheno ~ addcovar + pr[,,j] + intcovar:pr[,,j])$loglik[2] - null_ll
     
   } # for(j)
   
