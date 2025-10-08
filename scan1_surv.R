@@ -35,9 +35,6 @@ scan1_surv = function(genoprobs, pheno, addcovar = NULL,
   names(pheno_surv) = rownames(pheno)
   
   lod = vector("list", length(probs))
-  
-  # Null model log_likelihood.
-  null_ll = coxph(pheno_surv ~ addcovar)$loglik[2]
 
   if(is.null(intcovar)) {
     
@@ -64,7 +61,7 @@ scan1_surv = function(genoprobs, pheno, addcovar = NULL,
   
   retval = matrix(unlist(lod), ncol = 1, dimnames = list(markers, "survival"))
   # Convert log-likelihood to LOD.
-  retval[,1] = (retval[,1] - null_ll) / log(10)
+  retval[,1] = retval[,1] / log(10)
   class(retval) = c("scan1", "matrix")
   
   return(retval)
@@ -88,8 +85,11 @@ scan1_surv_addcovar = function(chr, pr, pheno, addcovar) {
     lod[j,1] = coxph(pheno ~ addcovar + pr[,,j])$loglik[2]
     
   } # for(j)
+
+  # Null model log_likelihood.
+  null_ll = coxph(pheno_surv ~ addcovar)$loglik[2]
   
-  lod
+  lod - null_ll
   
 } # scan1_surv_addcovar()
 
