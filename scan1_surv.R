@@ -68,6 +68,7 @@ scan1_surv = function(genoprobs, pheno, addcovar = NULL,
   lrs = as.matrix(do.call(rbind, lrs))
   
   # Convert log-likelihood to LOD.
+  # We don't have to divide by 2 becuase we didn't multiply the LRS by 2.
   lod = lrs / log(10)
   
   dimnames(lod) = list(markers, c('lod_add', 'lod_int'))
