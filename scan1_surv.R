@@ -60,10 +60,14 @@ scan1_surv = function(genoprobs, pheno, addcovar = NULL,
 
   # Get the markers.
   markers = unlist(sapply(probs, function(z) { dimnames(z)[[3]] }))
+
+  lod = as.matrix(do.call(rbind, lod))
   
-  retval = matrix(unlist(lod), ncol = 1, dimnames = list(markers, "survival"))
   # Convert log-likelihood to LOD.
-  retval[,1] = retval[,1] / log(10)
+  retval = lod / log(10)
+  
+  dimnames(retval) = list(markers, c('lod_add', 'lod_int'))
+  
   class(retval) = c("scan1", "matrix")
   
   return(retval)
