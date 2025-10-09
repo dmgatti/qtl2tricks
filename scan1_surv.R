@@ -81,6 +81,7 @@ scan1_surv = function(genoprobs, pheno, addcovar = NULL,
 
 
 # Internal function used by scan1_surv() for addtive covariates.
+### DMG: May not be handling the X chromsome correctly.
 scan1_surv_addcovar = function(chr, pr, pheno, addcovar) {
 
   # Get the probs for the requested chromosome.
@@ -110,6 +111,7 @@ scan1_surv_addcovar = function(chr, pr, pheno, addcovar) {
 
 
 # Internal function used by scan1_surv() for addtive and interactive covariates.
+### DMG: May not be handling the X chromsome correctly.
 scan1_surv_intcovar = function(chr, pr, pheno, addcovar, intcovar) {
 
   # Get the probs for the requested chromosome.
@@ -134,6 +136,8 @@ scan1_surv_intcovar = function(chr, pr, pheno, addcovar, intcovar) {
     int_ll   = coxph(pheno ~ addcovar + pr[,,j] + intcovar:pr[,,j])$loglik[2]
 
     # Subtract the appropriate null model.
+    ### DMG: Something is wrong here. I get negative LODs for the interaction
+    ###      model. Will consult with others and determine how to fix it.
     lrs[j,1] = add_ll - null_ll
     lrs[j,2] = int_ll - add_ll
     
