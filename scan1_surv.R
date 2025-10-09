@@ -26,11 +26,12 @@ require(BiocParallel)
 scan1_surv = function(genoprobs, pheno, addcovar = NULL, 
                       intcovar = NULL, cores = 1) {
   
-  register(BPPARAM = SnowParam(workers = cores, progressbar = TRUE))
+  register(BPPARAM = MulticoreParam(workers = cores, progressbar = TRUE))
   
   # Declare return value.
   retval = NULL
 
+  # Convert the phenotype into a survival object.
   pheno_surv        = Surv(time = pheno$survival, event = pheno$event)
   names(pheno_surv) = rownames(pheno)
   
@@ -57,6 +58,7 @@ scan1_surv = function(genoprobs, pheno, addcovar = NULL,
 
   } # else
 
+  # Get the markers.
   markers = unlist(sapply(probs, function(z) { dimnames(z)[[3]] }))
   
   retval = matrix(unlist(lod), ncol = 1, dimnames = list(markers, "survival"))
@@ -72,10 +74,13 @@ scan1_surv = function(genoprobs, pheno, addcovar = NULL,
 # Internal function used by scan1_surv() for addtive covariates.
 scan1_surv_addcovar = function(chr, pr, pheno, addcovar) {
 
+  # Get the probs for the requested chromosome.
   pr = pr[[chr]][rownames(pheno),-1,, drop = FALSE]
 
+  # Number of markers.
   n_markers = dim(pr)[[3]]
-  
+
+  # Data structure to hold LOD (or LL).
   lod = data.frame(lod       = rep(0, n_markers),
                    row.names = dimnames(pr)[[3]])
   
@@ -88,7 +93,8 @@ scan1_surv_addcovar = function(chr, pr, pheno, addcovar) {
 
   # Null model log_likelihood.
   null_ll = coxph(pheno_surv ~ addcovar)$loglik[2]
-  
+
+  # Subtract null model LL from full model LL.
   lod - null_ll
   
 } # scan1_surv_addcovar()
@@ -96,19 +102,31 @@ scan1_surv_addcovar = function(chr, pr, pheno, addcovar) {
 
 # Internal function used by scan1_surv() for addtive and interactive covariates.
 scan1_surv_intcovar = function(chr, pr, pheno, addcovar, intcovar) {
-  
+
+  # Get the probs for the requested chromosome.
   pr = pr[[chr]][rownames(pheno),-1,, drop = FALSE]
   
+  # Number of markers.
   n_markers = dim(pr)[[3]]
-  
-  lod = data.frame(lod       = rep(0, n_markers),
+
+  # Data structure to hold LOD (or LL).
+  lod = data.frame(lod_add   = rep(0, n_markers),
+                   lod_int   = rep(0, n_markers),
                    row.names = dimnames(pr)[[3]])
+
+  # Get the null model LL.
+  null_ll  = coxph(pheno ~ addcovar)$loglik[2]
   
   # Get log-likelihood for each marker.
   for(j in 1:n_markers) {
 
-    null_ll  = coxph(pheno ~ addcovar + pr[,,j])$loglik[2]
-    lod[j,1] = coxph(pheno ~ addcovar + pr[,,j] + intcovar:pr[,,j])$loglik[2] - null_ll
+    # Calculate log-likelihoods for additive and interactive covariates.
+    add_ll   = coxph(pheno ~ addcovar + pr[,,j])$loglik[2]
+    int_ll   = coxph(pheno ~ addcovar + pr[,,j] + intcovar:pr[,,j])$loglik[2]
+
+    # Subtract the appropriate null model.
+    lod[j,1] = add_ll - null_ll
+    lod[j,2] = int_ll - add_ll
     
   } # for(j)
   
