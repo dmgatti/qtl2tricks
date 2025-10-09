@@ -29,21 +29,23 @@ scan1_surv = function(genoprobs, pheno, addcovar = NULL,
   register(BPPARAM = MulticoreParam(workers = cores, progressbar = TRUE))
   
   # Declare return value.
-  retval = NULL
+  lod = NULL
 
   # Convert the phenotype into a survival object.
   pheno_surv        = Surv(time = pheno$survival, event = pheno$event)
   names(pheno_surv) = rownames(pheno)
   
-  lod = vector("list", length(probs))
+  lrs = vector("list", length(probs))
 
   if(is.null(intcovar)) {
     
     ### Additive covariates ###
     
     # For each chromosome...
-    lod = bplapply(seq_along(probs), scan1_surv_addcovar,
-                   pr = probs, pheno = pheno_surv, addcovar = addcovar,
+    lrs = bplapply(seq_along(probs), scan1_surv_addcovar,
+                   pr        = probs, 
+                   pheno     = pheno_surv, 
+                   addcovar  = addcovar,
                    BPOPTIONS = bpoptions(packages = c('stats', 'survival')))
   
   } else {
@@ -51,9 +53,11 @@ scan1_surv = function(genoprobs, pheno, addcovar = NULL,
     ### Interactive covariate ###
     
     # For each chromosome...
-    lod = bplapply(seq_along(probs), scan1_surv_intcovar,
-                   pr = probs, pheno = pheno_surv, addcovar = addcovar,
-                   intcovar = intcovar, 
+    lrs = bplapply(seq_along(probs), scan1_surv_intcovar,
+                   pr        = probs, 
+                   pheno     = pheno_surv, 
+                   addcovar  = addcovar,
+                   intcovar  = intcovar, 
                    BPOPTIONS = bpoptions(packages = c('stats', 'survival')))
 
   } # else
@@ -61,16 +65,16 @@ scan1_surv = function(genoprobs, pheno, addcovar = NULL,
   # Get the markers.
   markers = unlist(sapply(probs, function(z) { dimnames(z)[[3]] }))
 
-  lod = as.matrix(do.call(rbind, lod))
+  lrs = as.matrix(do.call(rbind, lrs))
   
   # Convert log-likelihood to LOD.
-  retval = lod / log(10)
+  lod = lrs / log(10)
   
-  dimnames(retval) = list(markers, c('lod_add', 'lod_int'))
+  dimnames(lod) = list(markers, c('lod_add', 'lod_int'))
   
-  class(retval) = c("scan1", "matrix")
+  class(lod) = c("scan1", "matrix")
   
-  return(retval)
+  return(lod)
   
 } # scan1_surv()
 
@@ -84,14 +88,14 @@ scan1_surv_addcovar = function(chr, pr, pheno, addcovar) {
   # Number of markers.
   n_markers = dim(pr)[[3]]
 
-  # Data structure to hold LOD (or LL).
-  lod = data.frame(lod       = rep(0, n_markers),
+  # Data structure to hold LRS.
+  lrs = data.frame(lrs       = rep(0, n_markers),
                    row.names = dimnames(pr)[[3]])
   
   # Get log-likelihood for each marker.
   for(j in 1:n_markers) {
     
-    lod[j,1] = coxph(pheno ~ addcovar + pr[,,j])$loglik[2]
+    lrs[j,1] = coxph(pheno ~ addcovar + pr[,,j])$loglik[2]
     
   } # for(j)
 
@@ -99,7 +103,7 @@ scan1_surv_addcovar = function(chr, pr, pheno, addcovar) {
   null_ll = coxph(pheno_surv ~ addcovar)$loglik[2]
 
   # Subtract null model LL from full model LL.
-  lod - null_ll
+  lrs - null_ll
   
 } # scan1_surv_addcovar()
 
@@ -113,9 +117,9 @@ scan1_surv_intcovar = function(chr, pr, pheno, addcovar, intcovar) {
   # Number of markers.
   n_markers = dim(pr)[[3]]
 
-  # Data structure to hold LOD (or LL).
-  lod = data.frame(lod_add   = rep(0, n_markers),
-                   lod_int   = rep(0, n_markers),
+  # Data structure to hold LRS.
+  lrs = data.frame(lrs_add   = rep(0, n_markers),
+                   lrs_int   = rep(0, n_markers),
                    row.names = dimnames(pr)[[3]])
 
   # Get the null model LL.
@@ -129,12 +133,12 @@ scan1_surv_intcovar = function(chr, pr, pheno, addcovar, intcovar) {
     int_ll   = coxph(pheno ~ addcovar + pr[,,j] + intcovar:pr[,,j])$loglik[2]
 
     # Subtract the appropriate null model.
-    lod[j,1] = add_ll - null_ll
-    lod[j,2] = int_ll - add_ll
+    lrs[j,1] = add_ll - null_ll
+    lrs[j,2] = int_ll - add_ll
     
   } # for(j)
   
-  lod
+  lrs
   
 } # scan1_surv_intcovar()
 
