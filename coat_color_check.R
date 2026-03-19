@@ -44,7 +44,7 @@ call_diplotypes = function(pr) {
   # Or one founder is > 0.5 and the rest of the probs are spread out.
   # In this case, select the two highest founder probs.
   rs  = rowSums(pr2)
-  wh0 = which(rs < 2)
+  wh0 = which(rs != 2)
 
   for(i in seq_along(wh0)) {
 
